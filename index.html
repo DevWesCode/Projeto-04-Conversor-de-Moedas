@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Conversor de Moedas</title>
+</head>
+
+<body>
+    <img id="coinFlip" src="./assets/logo.gif" alt="Coin-Flip">
+
+    <main>
+        <label for="moedaOrigem">Converter de:
+            <select id="moedaOrigem">
+                <option value="usd">Dólar (USD)</option>
+                <option value="eur">Euro (EUR)</option>
+                <option value="gbp">Libra (GBP)</option>
+                <option value="brl">Real (BRL)</option>
+                <option value="btc">Bitcoin (BTC)</option>
+            </select>
+        </label>
+
+        <label for="moedaDestino"> Converter para:
+            <select id="moedaDestino">
+                <option value="usd">Dólar (USD)</option>
+                <option value="eur">Euro (EUR)</option>
+                <option value="gbp">Libra (GBP)</option>
+                <option value="brl">Real (BRL)</option>
+                <option value="btc">Bitcoin (BTC)</option>
+            </select>
+        </label>
+
+        <label for="valor">Valor:
+            <input type="number" id="valor" placeholder="0,00">
+        </label>
+
+        <button id="convert-button">Converter</button>
+
+        <section>
+            <div class="boxValor">
+                <img id="imagemOrigem" src="./assets/usd.png" alt="logo-moeda-converter">
+                <p id="moedaOrigemNome">Dólar</p>
+                <p class="valorConvert"> 10.000,00</p>
+            </div>
+
+            <img id="imgSeta" src="./assets/Vector.png" alt="seta">
+
+            <div class="boxValor">
+                <img id="imagemDestino" src="./assets/brl.png" alt="logo-moeda-convertida">
+                <p id="moedaDestinoNome">Real</p>
+                <p class="valorConvert"> 10.000,00</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="./scripts.js"></script>
+</body>
+
+</html>
