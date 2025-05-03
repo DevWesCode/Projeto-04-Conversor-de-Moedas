@@ -1,5 +1,3 @@
-
-
 // Constantes criadas para selecionar os selects no HTML/DOM 
 const moedaOrigem = document.getElementById('moedaOrigem');
 const moedaDestino = document.getElementById('moedaDestino');
@@ -20,15 +18,6 @@ const moedas = {
     btc: { imagem: './assets/btc.png', nome: 'Bitcoin', sigla: 'BTC' }
 };
 
-// Constante criada para dar valores "fictícios" para as moedas
-const taxasDeCambio = {
-    usd: { usd: 1, eur: 1.04, gbp: 1.23, btc: 0.000096, brl: 6.03 },
-    eur: { usd: 1.04, eur: 1, gbp: 0.85, btc: 0.000099, brl: 6.27 },
-    gbp: { usd: 1.23, eur: 1.18, gbp: 1, btc: 0.000012, brl: 7.42 },
-    brl: { usd: 0.16, eur: 0.15, gbp: 0.13, btc: 0.0000016, brl: 1 },
-    btc: { usd: 104382, eur: 100600, gbp: 85000, btc: 1, brl: 621690 }
-};
-
 // Função para formatar números com separador de milhar e vírgula para decimal
 function formatarNumero(num) {
     return num.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -45,36 +34,44 @@ function atualizarImagens() {
     moedaDestinoNome.textContent = moedas[destino].nome;
 }
 
-// Função criada para convertee o valor digitado para a moeda de destino
+// Função para converter os valores utilizando a API, com .then()
 function convertValues() {
-    let valor = inputValor.value;
-    valor = parseFloat(valor);
+    let valor = parseFloat(inputValor.value);
+    const origem = moedaOrigem.value.toUpperCase(); // Deixa em maiúsculas
+    const destino = moedaDestino.value.toUpperCase();
 
-    const origem = moedaOrigem.value;
-    const destino = moedaDestino.value;
-
-    console.log("Valor inserido: ", valor);
-    console.log("Moeda de origem selecionada: ", moedas[origem].nome);
-    console.log("Moeda de destino selecionada: ", moedas[destino].nome);
-    
-    // Criando log de erro
     if (isNaN(valor) || valor <= 0) {
-        console.log("Valor inválido");
         valoresConvertidos[0].textContent = "Valor inválido";
         valoresConvertidos[1].textContent = "Valor inválido";
         return;
     }
 
-    const taxa = taxasDeCambio[origem][destino]; // Obtém a taxa de câmbio
-    console.log("Taxa de câmbio de", moedas[origem].sigla, "para", moedas[destino].sigla, ":", taxa);
+    // Monta a URL apenas com as moedas necessárias
+    const url = `https://economia.awesomeapi.com.br/last/${origem}-${destino}`;
 
-    const valorFinal = valor * taxa; // Faz a conversão
-    const valorFinalFormatado = formatarNumero(valorFinal); // Aplica a formatação ao valor convertido
+    // Faz a requisição com fetch e processa com .then()
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Dados da API:", data); // Debugging
+            const parMoeda = `${origem}${destino}`; // Ex: "USDBRL"
 
-    console.log(`Valor convertido: ${valor} ${moedas[origem].sigla} = ${valorFinalFormatado} ${moedas[destino].sigla}`);
+            if (!data[parMoeda]) throw new Error("Par de moedas não encontrado");
 
-    valoresConvertidos[0].textContent = `${moedas[origem].sigla} ${formatarNumero(valor)}`; // Mostra o valor digitado
-    valoresConvertidos[1].textContent = `${moedas[destino].sigla} ${valorFinalFormatado}`; // Mostra o valor convertido
+            const taxa = parseFloat(data[parMoeda].bid);
+            const valorFinal = valor * taxa;
+            const valorFinalFormatado = formatarNumero(valorFinal);
+
+            valoresConvertidos[0].textContent = `${moedas[origem.toLowerCase()].sigla} ${formatarNumero(valor)}`;
+            valoresConvertidos[1].textContent = `${moedas[destino.toLowerCase()].sigla} ${valorFinalFormatado}`;
+        })
+        .catch(error => {
+            console.error("Erro na conversão:", error);
+            valoresConvertidos[1].textContent = "Erro na conversão";
+        });
 }
 
 // Formatar o valor ao digitar
@@ -92,7 +89,7 @@ atualizarImagens();
 // Adiciona o evento de clique como botão do mouse para converter
 convertButton.addEventListener("click", convertValues);
 
-// Adiciona evento de tecla ao precionar o Enter para converter o valor
+// Adiciona evento de tecla ao pressionar o Enter para converter o valor
 inputValor.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         convertValues();
